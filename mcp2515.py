@@ -103,3 +103,27 @@ def initialize():
 def reset():
     global spi
     spi.writebytes(0b11000000.to_bytes())
+
+def transmit(can_id: int, message: bytes):
+    # Sanity check, max 8 bytes per CAN frame
+    if len(message > 8):
+        raise ValueError
+
+    # Sanity check, standard CAN ID is 11 bits max (this breaks extended IDs)
+    if (can_id > 0x7FF):
+        raise ValueError
+
+    can_id_hi = can_id & 0xFF00
+    can_id_lo = can_id & 0x00FF
+
+    # Write data to TXB0
+    spi.xfer2(0b01000000.to_bytes() + can_id_hi.to_bytes() + can_id_lo.to_bytes() + message) # i hope this works
+
+    # Request to send TXB0
+    spi.xfer2(0b10000001.to_bytes())
+
+def poll_receive():
+    filler = 0x00.to_bytes() * 8 # 64 bits of padding to receive 8 bytes of data from CAN
+    instruction = 0b10010000.to_bytes() + filler
+
+    return spi.xfer2(instruction)

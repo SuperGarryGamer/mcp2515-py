@@ -118,7 +118,7 @@ class SPIController:
         can_id_lo = can_id & 0x00FF
 
         # Write data to TXB0
-        self.spi.xfer2(0b01000000.to_bytes() + can_id_hi.to_bytes() + can_id_lo.to_bytes() + message) # i hope this works
+        self.spi.xfer2(0b01000000.to_bytes() + can_id_hi.to_bytes() + can_id_lo.to_bytes() + len(message).to_bytes + message) # i hope this works
 
         # Request to send TXB0
         self.spi.xfer2(0b10000001.to_bytes())

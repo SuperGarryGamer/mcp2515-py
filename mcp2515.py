@@ -97,9 +97,9 @@ spi = None
 def initialize():
     global spi
     spi = spidev.SpiDev()
+    spi.open(0, SPI_DEVICE)
     spi.max_speed_hz = SPI_FREQUENCY_HZ
     spi.mode = 0b00 # One of two modes supported by MCP2515, chosen arbitrarily because i don't know
-    spi.open(0, SPI_DEVICE)
     reset()
     time.sleep(0.1)
 

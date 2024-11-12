@@ -126,7 +126,7 @@ def transmit(can_id: int, message: bytes):
     spi.xfer2(0b10000001.to_bytes())
 
 def poll_receive():
-    filler = 0x00.to_bytes() * 13 * 8 # enough padding to receive full message
+    filler = 0x00.to_bytes() * 13 # enough padding to receive full message
     instruction = 0b10010000.to_bytes() + filler
 
     result = spi.xfer2(instruction)

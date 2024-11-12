@@ -114,8 +114,8 @@ class SPIController:
         if (can_id > 0x7FF):
             raise ValueError
 
-        can_id_hi = can_id >> 8
-        can_id_lo = can_id & 0x00FF
+        can_id_hi = can_id >> 3
+        can_id_lo = (can_id & 0b0000000000000111) << 5
 
         # Write data to TXB0
         self.spi.xfer2(0b01000000.to_bytes() + can_id_hi.to_bytes() + can_id_lo.to_bytes() + 0x00.to_bytes() * 2 + len(message).to_bytes() + message) # i hope this works

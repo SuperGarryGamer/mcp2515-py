@@ -2,6 +2,7 @@
 # Written by Jay 2024-11-05
 
 import spidev
+import time
 
 # MCP2515 Register addresses
 
@@ -99,6 +100,8 @@ def initialize():
     spi.max_speed_hz = SPI_FREQUENCY_HZ
     spi.mode = 0b00 # One of two modes supported by MCP2515, chosen arbitrarily because i don't know
     spi.open(0, SPI_DEVICE)
+    reset()
+    time.sleep(0.1)
 
 def reset():
     global spi
@@ -126,4 +129,6 @@ def poll_receive():
     filler = 0x00.to_bytes() * 8 # 64 bits of padding to receive 8 bytes of data from CAN
     instruction = 0b10010000.to_bytes() + filler
 
-    return spi.xfer2(instruction)
+    result = spi.xfer2(instruction)
+    can_id = result[:2]
+    return (can_id, result[2:])

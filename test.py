@@ -6,8 +6,10 @@ can.initialize()
 
 try:
     while True:
-        print(can.poll_receive())
-        can.transmit(int(random.random() * 0x7FF), bytes("owo", "ASCII"))
+        print("RX: " + can.poll_receive())
+        can_id = int(random.random() * 0x7FF)
+        print("TX: " + [can_id] + [ord(c) for c in "owo"])
+        can.transmit(can_id, bytes("owo", "ASCII"))
         time.sleep(1)
 
 except KeyboardInterrupt:

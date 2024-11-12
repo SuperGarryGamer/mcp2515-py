@@ -116,7 +116,7 @@ def transmit(can_id: int, message: bytes):
     if (can_id > 0x7FF):
         raise ValueError
 
-    can_id_hi = can_id & 0xFF00
+    can_id_hi = can_id >> 8
     can_id_lo = can_id & 0x00FF
 
     # Write data to TXB0

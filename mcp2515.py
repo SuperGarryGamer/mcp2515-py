@@ -109,7 +109,7 @@ def reset():
 
 def transmit(can_id: int, message: bytes):
     # Sanity check, max 8 bytes per CAN frame
-    if len(message > 8):
+    if len(message) > 8:
         raise ValueError
 
     # Sanity check, standard CAN ID is 11 bits max (this breaks extended IDs)

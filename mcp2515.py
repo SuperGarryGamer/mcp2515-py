@@ -130,5 +130,5 @@ def poll_receive():
     instruction = 0b10010000.to_bytes() + filler
 
     result = spi.xfer2(instruction)
-    can_id = result[:2]
-    return (can_id, result[2:])
+    can_id = result[0] << 8 + result[1]
+    return (can_id, result[5:])

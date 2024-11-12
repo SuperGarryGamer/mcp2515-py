@@ -1,8 +1,8 @@
-import mcp2515 as can
+import mcp2515
 import random
 import time
 
-can.initialize()
+can = mcp2515.SPIController()
 
 try:
     while True:

@@ -92,43 +92,41 @@ SPI_DEVICE = 0
 # Max from the datasheet (10 MHz)
 SPI_FREQUENCY_HZ = 10_000_000
 
-spi = None
+class SPIController:
 
-def initialize():
-    global spi
-    spi = spidev.SpiDev()
-    spi.open(0, SPI_DEVICE)
-    spi.max_speed_hz = SPI_FREQUENCY_HZ
-    spi.mode = 0b00 # One of two modes supported by MCP2515, chosen arbitrarily because i don't know
-    reset()
-    time.sleep(0.1)
+    def __init__(self):
+        self.spi = spidev.SpiDev()
+        self.spi.open(0, SPI_DEVICE)
+        self.spi.max_speed_hz = SPI_FREQUENCY_HZ
+        self.spi.mode = 0b00 # One of two modes supported by MCP2515, chosen arbitrarily because i don't know
+        self.reset()
+        time.sleep(0.1)
 
-def reset():
-    global spi
-    spi.writebytes(0b11000000.to_bytes())
+    def reset(self):
+        self.spi.writebytes(0b11000000.to_bytes())
 
-def transmit(can_id: int, message: bytes):
-    # Sanity check, max 8 bytes per CAN frame
-    if len(message) > 8:
-        raise ValueError
+    def transmit(self, can_id: int, message: bytes):
+        # Sanity check, max 8 bytes per CAN frame
+        if len(message) > 8:
+            raise ValueError
 
-    # Sanity check, standard CAN ID is 11 bits max (this breaks extended IDs)
-    if (can_id > 0x7FF):
-        raise ValueError
+        # Sanity check, standard CAN ID is 11 bits max (this breaks extended IDs)
+        if (can_id > 0x7FF):
+            raise ValueError
 
-    can_id_hi = can_id >> 8
-    can_id_lo = can_id & 0x00FF
+        can_id_hi = can_id >> 8
+        can_id_lo = can_id & 0x00FF
 
-    # Write data to TXB0
-    spi.xfer2(0b01000000.to_bytes() + can_id_hi.to_bytes() + can_id_lo.to_bytes() + message) # i hope this works
+        # Write data to TXB0
+        self.spi.xfer2(0b01000000.to_bytes() + can_id_hi.to_bytes() + can_id_lo.to_bytes() + message) # i hope this works
 
-    # Request to send TXB0
-    spi.xfer2(0b10000001.to_bytes())
+        # Request to send TXB0
+        self.spi.xfer2(0b10000001.to_bytes())
 
-def poll_receive():
-    filler = 0x00.to_bytes() * 13 # enough padding to receive full message
-    instruction = 0b10010000.to_bytes() + filler
+    def poll_receive(self):
+        filler = 0x00.to_bytes() * 13 # enough padding to receive full message
+        instruction = 0b10010000.to_bytes() + filler
 
-    result = spi.xfer2(instruction)
-    can_id = result[0] << 8 + result[1]
-    return (can_id, result[5:])
+        result = self.spi.xfer2(instruction)
+        can_id = result[0] << 8 + result[1]
+        return (can_id, result[5:])

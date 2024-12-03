@@ -26,8 +26,8 @@ def initialize():
 
 
 def transmit_frame(frame: Can_Frame):
-    print(spi)
     global spi
+    print(spi)
     if len(frame.data) > 8:
         raise ValueError
     if frame.sid > 0x07ff:

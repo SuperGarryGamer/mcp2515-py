@@ -3,7 +3,7 @@ import queue
 
 SPEED = 10_000_000 # 10 MHz SPI
 
-spi = None
+global spi
 
 class Can_Frame:
     def __init__(self):

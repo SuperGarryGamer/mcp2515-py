@@ -12,10 +12,12 @@ class Can_Frame:
 
 def initialize():
     global spi
+    print(spi)
     spi = spidev.SpiDev()
     spi.open(0, 0)
     spi.max_speed_hz = SPEED
     spi.mode = 0b00
+    print(spi)
 
     reset()
 
@@ -24,6 +26,7 @@ def initialize():
 
 
 def transmit_frame(frame: Can_Frame):
+    print(spi)
     global spi
     if len(frame.data) > 8:
         raise ValueError

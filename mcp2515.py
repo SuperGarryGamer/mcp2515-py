@@ -12,7 +12,6 @@ class Can_Frame:
 
 def initialize():
     global spi
-    print(spi)
     spi = spidev.SpiDev()
     spi.open(0, 0)
     spi.max_speed_hz = SPEED

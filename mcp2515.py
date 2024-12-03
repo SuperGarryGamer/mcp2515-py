@@ -49,3 +49,4 @@ f1.sid = 1234
 f1.data = [160, 7, 200, 7]
 input()
 transmit_frame(f1)
+spi.close()

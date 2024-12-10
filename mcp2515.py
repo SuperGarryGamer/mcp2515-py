@@ -1,7 +1,11 @@
 import spidev
+import sys
+import signal
+import RPi.GPIO as gpio
 import queue
 
 SPEED = 10_000_000 # 10 MHz SPI
+INTERRUPT_PIN = 25 # GPIO25, 11th pin on the outside row (physical pin 22)
 
 global spi
 
@@ -22,6 +26,8 @@ def initialize():
 
     # Switch to normal mode
     spi.writebytes(bytes([0x02, 0x0f, 0x00]))
+    # Enable message receive interrupt for RXB0
+    spi.writebytes(bytes([0x02, 0x2b, 0x01]))
 
 
 def transmit_frame(frame: Can_Frame):
@@ -44,6 +50,10 @@ def reset():
     global spi
     spi.writebytes(bytes([0xc0]))
 
+def on_can_interrupt():
+    num_interrupts += 1
+    print(f"I got an interrupt :3, {num_interrupts}")
+
 # Testing:
 initialize()
 f1 = Can_Frame()
@@ -51,4 +61,15 @@ f1.sid = 1234
 f1.data = [160, 7, 200, 7]
 input()
 transmit_frame(f1)
+
+# Testing
+gpio.setmode(gpio.BCM)
+gpio.setup(INTERRUPT_PIN, gpio.IN)
+gpio.add_event_detect(INTERRUPT_PIN, gpio.FALLING, callback=on_can_interrupt, bouncetime=50)
+
+num_interrupts = 0
+
+while num_interrupts < 5:
+    pass
+
 spi.close()

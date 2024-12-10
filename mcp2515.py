@@ -46,11 +46,22 @@ def transmit_frame(frame: Can_Frame):
     spi.writebytes(bytes(to_transmit))
     spi.writebytes(bytes([0x81]))
 
+def read_rxb0():
+    global spi
+    to_xfer = bytes([0x90] + [0x00]*13)
+    recv = spi.xfer(to_xfer)
+    new_frame = Can_Frame()
+    new_frame.sid = recv[1] << 3
+    new_frame.sid += (recv[2] >> 5)
+    for i in range(recv[5]):
+        new_frame.data.append(recv[6+i])
+    return new_frame
+
 def reset():
     global spi
     spi.writebytes(bytes([0xc0]))
 
-def on_can_interrupt():
+def on_can_interrupt(channel):
     num_interrupts += 1
     print(f"I got an interrupt :3, {num_interrupts}")
 
